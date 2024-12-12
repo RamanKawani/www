@@ -1,51 +1,40 @@
-# Import necessary libraries
 import streamlit as st
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
-# Function to load geospatial data (for example, a shapefile)
-def load_data(shapefile_path):
-    try:
-        # Load the shapefile into a Geopandas dataframe
-        gdf = gpd.read_file(shapefile_path)
-        return gdf
-    except Exception as e:
-        st.error(f"Error loading shapefile: {e}")
-        return None
+# Load GeoDataFrame
+@st.cache_data
+def load_data():
+    # Replace with your path to the geospatial data (e.g., GeoJSON, shapefile, etc.)
+    gdf = gpd.read_file('data/your_geo_data.geojson')  # Change this to your file
+    return gdf
 
-# Function to plot the geospatial data
+# Display map function
 def plot_map(gdf):
-    try:
-        # Plotting the geospatial data using Matplotlib
-        ax = gdf.plot(figsize=(10, 6), cmap='viridis')
-        plt.title('Geospatial Data')
-        st.pyplot(fig=plt.gcf())  # Display the plot in the Streamlit app
-    except Exception as e:
-        st.error(f"Error plotting the map: {e}")
+    # Plot the map
+    fig, ax = plt.subplots(figsize=(10, 10))
+    gdf.plot(ax=ax, color='lightblue', edgecolor='black')
+    ax.set_title("Geospatial Data Map", fontsize=16)
+    st.pyplot(fig)
 
-# Streamlit app setup
+# Main Streamlit app
 def main():
     st.title("Geospatial Data Viewer")
+    
+    st.write("""
+    This app visualizes geospatial data using Streamlit and GeoPandas.
+    """)
+    
+    # Load data
+    gdf = load_data()
 
-    # Upload shapefile
-    uploaded_file = st.file_uploader("Upload a shapefile", type=["shp"])
-    
-    if uploaded_file is not None:
-        # Save uploaded file temporarily
-        with open("/tmp/temp_shapefile.shp", "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        
-        # Load and display the shapefile data
-        gdf = load_data("/tmp/temp_shapefile.shp")
-        
-        if gdf is not None:
-            # Display dataframe and plot map
-            st.write("Geospatial Data")
-            st.dataframe(gdf.head())  # Display first few rows of the dataframe
-            plot_map(gdf)
-        else:
-            st.warning("No data available to plot.")
-    
+    # Display map
+    st.write("Map of the Geospatial Data:")
+    plot_map(gdf)
+
+    # Optionally, show some information about the data
+    st.write("Data Info:")
+    st.write(gdf.head())  # Show first few rows of the data
+
 if __name__ == "__main__":
     main()
-
