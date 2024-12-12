@@ -6,3 +6,4 @@ gdf = gpd.GeoDataFrame(data)
 
 # Print GeoDataFrame
 print(gdf)
+python my_script.py
